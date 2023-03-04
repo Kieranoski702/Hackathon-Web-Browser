@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-pub type Attrs = HashMap<String, String>;
-
 /**
  * Root HTML structure.
  */
@@ -28,27 +26,17 @@ pub struct Body {
     /**
      * The Elements of the body.
      */
-    pub elements: Vec<Elem>
+    pub elements: Vec<Token>
 }
 
-/**
- * Element types.
- */
+pub enum Token {
+    START(Elem),
+    END(Elem),
+    TEXT(String),
+    PARAGRAPH
+}
+
 pub enum Elem {
-    /**
-     * b / strong tags.
-     */
-    STRONG(Vec<Elem>, Attrs),
-    /**
-     * i / em tags.
-     */
-    EM(Vec<Elem>, Attrs),
-    /**
-     * p tags.
-     */
-    P(Vec<Elem>, Attrs),
-    /**
-     * Text blocks.
-     */
-    TEXT(String)
+    STRONG,
+    EM
 }

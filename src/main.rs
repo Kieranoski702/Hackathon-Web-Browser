@@ -1,9 +1,11 @@
 mod html_adt;
 use std::fs::File;
-use std::io::{BufReader, Read};
+use std::io::Read;
+
+mod ansi_helper;
 use clap::{Parser, Subcommand};
 mod HtmlParser;
-mod Renderer;
+mod renderer;
 mod Requester;
 
 #[derive(Parser)]
@@ -39,5 +41,5 @@ fn main() {
     let parsed_html = HTMLParser::parseHTML(&contents);
 
     // Pass the parsed HTML to the renderer
-    Renderer::render(parsed_html);
+    renderer::render(&parsed_html);
 }

@@ -1,11 +1,9 @@
-use crate::html_adt::{Elem, Header, Token};
+use crate::html_adt::{Attrs, Elem, Header, Token};
 use nom::branch::alt;
-use nom::bytes::complete::{tag, take, take_while};
+use nom::bytes::complete::{tag, take_while};
 use nom::character::complete::{anychar, char, multispace0};
-use nom::character::is_alphanumeric;
-use nom::combinator::{fail, map, map_parser, opt, peek};
-use nom::error::{Error, ErrorKind};
-use nom::multi::{many0, many1, many_till};
+use nom::combinator::{fail, peek};
+use nom::multi::{many0, many_till};
 use nom::IResult;
 
 /**
@@ -24,13 +22,14 @@ pub fn parse_html<'a>(i: &'a str) -> IResult<&'a str, Vec<Token>> {
     Ok((i, body))
 }
 
+#[allow(dead_code)]
 fn p_header(i: &str) -> IResult<&str, Header> {
     todo!();
 }
 
 fn p_body(i: &str) -> IResult<&str, Vec<Token>> {
     //println!("START: p_body {} ", i);
-    let (i, mut content) = many0(alt((p_elem, p_text)))(i)?;
+    let (i, content) = many0(alt((p_elem, p_text)))(i)?;
 
     // Oh no , content is a Vec<Vec<Token>>
     // https://users.rust-lang.org/t/flatten-a-vec-vec-t-to-a-vec-t/24526
@@ -39,7 +38,7 @@ fn p_body(i: &str) -> IResult<&str, Vec<Token>> {
 }
 
 /* Similar to what we did in haskell! */
-
+#[allow(dead_code)]
 fn ignore_spaces<O, F>(i: &str, f: F) -> IResult<&str, O>
 where
     F: Fn(&str) -> IResult<&str, O>,
@@ -51,10 +50,12 @@ where
     Ok((i, res))
 }
 
+#[allow(dead_code)]
 fn p_html_open_tag(i: &str) -> IResult<&str, Token> {
     todo!();
 }
 
+#[allow(dead_code)]
 fn p_html_close_tag(i: &str) -> IResult<&str, Token> {
     todo!();
 }
@@ -72,7 +73,7 @@ fn p_text(i: &str) -> IResult<&str, Vec<Token>> {
     let (i, _) = multispace0(i)?;
     let mut vec: Vec<Token> = Vec::new();
     let token = Token::TEXT(s);
-    let token2 = Token::clone(&token);
+    // let token2 = Token::clone(&token);
     //println!("VALID TEXT: {:#?}", &token2);
     //println!("OK: p_text {}", i);
     vec.push(token);
@@ -117,7 +118,7 @@ fn p_open_tag(i: &str) -> IResult<&str, Token> {
     let elem = match_elem(name);
 
     //println!("OK: p_open_tag {}", i);
-    Ok((i, Token::START(elem)))
+    Ok((i, Token::START(elem, Attrs::new())))
 }
 
 fn p_close_tag(i: &str) -> IResult<&str, Token> {
@@ -133,7 +134,7 @@ fn p_close_tag(i: &str) -> IResult<&str, Token> {
     let elem = match_elem(name);
 
     //println!("OK: p_close_tag {}", i);
-    Ok((i, Token::END(elem)))
+    Ok((i, Token::END(elem, Attrs::new())))
 }
 
 fn p_close_certain_tag(desired: Token, i: &str) -> IResult<&str, Token> {
@@ -141,13 +142,13 @@ fn p_close_certain_tag(desired: Token, i: &str) -> IResult<&str, Token> {
     let (i, token) = p_close_tag(i)?;
 
     let desired_elem = match desired {
-        Token::START(e) => e,
-        Token::END(e) => e,
+        Token::START(e, _) => e,
+        Token::END(e, _) => e,
         _ => todo!(),
     };
-    let token_elem = match desired {
-        Token::START(e) => e,
-        Token::END(e) => e,
+    let token_elem = match token {
+        Token::START(e, _) => e,
+        Token::END(e, _) => e,
         _ => todo!(),
     };
     if token_elem.eq(&desired_elem) {

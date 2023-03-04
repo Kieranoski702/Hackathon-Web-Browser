@@ -28,6 +28,9 @@ enum Commands {
         #[clap(value_parser)]
         url: Option<String>,
     },
+    Open {
+        #[clap(value_parser)]
+        file: Option<String>,}
 }
 
 fn main() {
@@ -37,6 +40,11 @@ fn main() {
         Some(Commands::Search { url }) => {
             let url = url.clone().unwrap();
             contents = requester::request(&url).unwrap();
+        },
+        Some(Commands::Open { file }) => {
+            let file = file.clone().unwrap();
+            let mut file = File::open(file).unwrap();
+            file.read_to_string(&mut contents).unwrap();
         },
         None => {
             // Read the contents of the index.html file into a string

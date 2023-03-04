@@ -9,7 +9,7 @@ use clap::{Parser, Subcommand};
 use termion::{clear, cursor, terminal_size};
 mod HtmlParser;
 mod renderer;
-mod Requester;
+mod requester;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -34,7 +34,7 @@ fn main() {
     match &cli.command {
         Some(Commands::Search { url }) => {
             let url = url.clone().unwrap();
-            contents = Requester::request(&url).unwrap();
+            contents = requester::request(&url).unwrap();
         }
         None => {
             // Read the contents of the index.html file into a string
@@ -56,7 +56,7 @@ fn main() {
             "quit" => should_quit = true,
             "search" => {
                 let url = read_line();
-                let contents = Requester::request(&url).unwrap();
+                let contents = requester::request(&url).unwrap();
                 let parsed_html = HTMLParser::parseHTML(&contents);
                 let rendered_html = renderer::render(&parsed_html);
                 reader(rendered_html);

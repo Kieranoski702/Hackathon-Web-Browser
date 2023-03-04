@@ -1,7 +1,7 @@
 mod html_adt;
 use std::fs::File;
 use std::io::{BufReader, Read};
-mod Parser;
+mod HTMLParser;
 mod Renderer;
 
 fn main() {
@@ -11,7 +11,7 @@ fn main() {
     file.read_to_string(&mut contents);
 
     // Pass the contents of the file to the parser
-    let parsed_html = Parser::parse(&contents);
+    let parsed_html = HTMLParser::parseHTML(&contents);
 
     // Pass the parsed HTML to the renderer
     Renderer::render(parsed_html);

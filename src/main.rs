@@ -1,7 +1,5 @@
 use clap::{Parser, Subcommand};
 use nom::Finish;
-use std::fs::File;
-use std::io::Read;
 
 mod HTMLParser;
 mod Requester;
@@ -68,4 +66,6 @@ fn main() {
     } else {
         println!("Err");
     }
+
+
 }

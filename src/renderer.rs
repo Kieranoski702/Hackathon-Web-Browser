@@ -5,7 +5,7 @@ use crate::ansi_helper::colours;
 
 #[derive(Default)]
 pub struct Renderer {
-    list_depth: usize,
+    list_stack: Vec<(Elem, usize)>,
 }
 
 impl Renderer {

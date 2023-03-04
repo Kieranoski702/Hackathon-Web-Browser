@@ -29,42 +29,54 @@ pub mod colours {
     pub const BRIGHT_CYAN: RGB = RGB(41, 184, 219);
 }
 
-pub fn bold_on() {
-    write_code("1m");
+pub fn reset_all() -> String {
+    write_code("0m")
 }
 
-pub fn bold_off() {
-    write_code("22m");
+pub fn bold_on() -> String {
+    write_code("1m")
 }
 
-pub fn italics_on() {
-    write_code("3m");
+pub fn bold_off() -> String {
+    write_code("22m")
 }
 
-pub fn italics_off() {
-    write_code("23m");
+pub fn italics_on() -> String {
+    write_code("3m")
 }
 
-pub fn reset_fg_colour() {
-    write_code("39m");
+pub fn italics_off() -> String {
+    write_code("23m")
 }
 
-pub fn reset_bg_colour() {
+pub fn underline_on() -> String {
+    write_code("4m")
+}
+
+pub fn underline_off() -> String {
+    write_code("24m")
+}
+
+pub fn reset_fg_colour() -> String {
+    write_code("39m")
+}
+
+pub fn reset_bg_colour() -> String {
     write_code("49m")
 }
 
-pub fn reset_colour() {
-    print!("{}39m{}49m", CSI, CSI);
+pub fn reset_colour() -> String {
+    format!("{}39m{}49m", CSI, CSI)
 }
 
-pub fn set_fg_colour(c: &RGB) {
-    write_code(format!("38;2;{};{};{}m", c.0, c.1, c.2).as_str());
+pub fn set_fg_colour(c: &RGB) -> String {
+    write_code(format!("38;2;{};{};{}m", c.0, c.1, c.2).as_str())
 }
 
-pub fn set_bg_colour(c: &RGB) {
-    write_code(format!("48;2;{};{};{}m", c.0, c.1, c.2).as_str());
+pub fn set_bg_colour(c: &RGB) -> String {
+    write_code(format!("48;2;{};{};{}m", c.0, c.1, c.2).as_str())
 }
 
-fn write_code(code: &str) {
-    print!("{}{}", CSI, code);
+fn write_code(code: &str) -> String {
+    format!("{}{}", CSI, code)
 }

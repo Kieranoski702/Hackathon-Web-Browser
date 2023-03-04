@@ -20,6 +20,7 @@ pub enum Elem {
     NAV,
     MAIN,
     A,
+    P,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -27,7 +28,6 @@ pub enum Token {
     START(Elem, Attrs),
     END(Elem, Attrs),
     TEXT(String),
-    PARAGRAPH,
 }
 
 pub struct Header {}

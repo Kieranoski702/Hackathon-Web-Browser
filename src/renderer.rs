@@ -58,7 +58,7 @@ impl Renderer {
 
     fn start_h1(&self) -> String {
         format!(
-            "{}{}",
+            "{}{}\n",
             ansi_helper::bold_on(),
             ansi_helper::set_fg_colour(&colours::RED)
         )
@@ -73,7 +73,10 @@ impl Renderer {
     }
 
     fn start_h2(&self) -> String {
-        ansi_helper::set_fg_colour(&colours::BLUE)
+        format!(
+            "{}\n",
+            ansi_helper::set_fg_colour(&colours::BLUE)
+        )
     }
 
     fn end_h2(&self) -> String {

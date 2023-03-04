@@ -34,4 +34,18 @@ pub enum Token {
     TEXT(String),
 }
 
+impl Token {
+    pub fn start(e: Elem) -> Self {
+        Token::START(e, Attrs::new())
+    }
+
+    pub fn end(e: Elem) -> Self {
+        Token::END(e, Attrs::new())
+    }
+
+    pub fn text<T: Into<String>>(text: T) -> Self {
+        Token::TEXT(text.into())
+    }
+}
+
 pub struct Header {}

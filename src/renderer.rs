@@ -25,6 +25,8 @@ impl Renderer {
                     Elem::H4 | Elem::H5 => self.start_small_head(),
                     Elem::A => self.start_a(),
                     Elem::P => self.nl(),
+                    Elem::UL | Elem::OL => self.start_list(*elem),
+                    Elem::LI => self.start_li()?,
                     _ => String::new(),
                 },
                 Token::END(elem, attrs) => match elem {
@@ -37,6 +39,8 @@ impl Renderer {
                     Elem::H4 | Elem::H5 => self.end_small_head(),
                     Elem::A => self.end_a(attrs),
                     Elem::DIV => self.nl(),
+                    Elem::UL | Elem::OL => self.end_list(),
+                    Elem::LI => self.nl(),
                     _ => String::new(),
                 },
                 Token::TEXT(text) => String::clone(text),
@@ -45,7 +49,7 @@ impl Renderer {
             output.push_str(token_str.as_str());
         }
 
-        Ok(output)
+        Ok(output.trim_end().to_string())
     }
 
     fn start_strong(&self) -> String {
@@ -126,10 +130,28 @@ impl Renderer {
         )
     }
 
+    fn start_list(&mut self, elem: Elem) -> String {
+        self.list_stack.push((elem, 1));
+        String::new()
+    }
+
+    fn end_list(&mut self) -> String {
+        self.list_stack.pop();
+        String::new()
+    }
 
     fn start_li(&mut self) -> Result<String, Box<dyn Error>> {
-        if self.list_stack.is_empty() {
-            Ok(String::new())
+        if let Some(last_elem) = self.list_stack.last().cloned() {
+            let spaces = "  ".repeat(self.list_stack.len());
+            match last_elem {
+                (Elem::OL, i) => {
+                    self.list_stack.pop();
+                    self.list_stack.push((Elem::OL, i + 1));
+                    Ok(format!("{}{}. ", spaces, i))
+                }
+                (Elem::UL, _) => Ok(format!("{}• ", spaces)),
+                _ => Err("Invalid elem in list stack")?,
+            }
         } else {
             Err("Invalid <li> tag. Not in list.")?
         }

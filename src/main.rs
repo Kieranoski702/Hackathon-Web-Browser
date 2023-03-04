@@ -35,6 +35,6 @@ fn main() {
         }
     }
 
-    let parsed_html = HtmlParser::parsehtml(&contents);
+    let parsed_html = HtmlParser::parseHTML(&contents);
     Renderer::render(parsed_html);
 }

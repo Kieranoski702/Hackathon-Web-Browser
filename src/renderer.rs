@@ -2,6 +2,7 @@ use crate::html_adt::{attr_names, Attrs, Elem, Token};
 
 use crate::ansi_helper;
 use crate::ansi_helper::colours;
+use std::error::Error;
 
 #[derive(Default)]
 pub struct Renderer {
@@ -9,7 +10,7 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn render(&mut self, tokens: &Vec<Token>) -> String {
+    pub fn render(&mut self, tokens: &Vec<Token>) -> Result<String, Box<dyn Error>> {
         let mut output = String::new();
 
         for token in tokens {
@@ -44,7 +45,7 @@ impl Renderer {
             output.push_str(token_str.as_str());
         }
 
-        output
+        Ok(output)
     }
 
     fn start_strong(&self) -> String {
@@ -123,6 +124,15 @@ impl Renderer {
                 .unwrap_or(&String::new()),
             ansi_helper::underline_off()
         )
+    }
+
+
+    fn start_li(&mut self) -> Result<String, Box<dyn Error>> {
+        if self.list_stack.is_empty() {
+            Ok(String::new())
+        } else {
+            Err("Invalid <li> tag. Not in list.")?
+        }
     }
 
     fn nl(&self) -> String {

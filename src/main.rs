@@ -61,7 +61,10 @@ fn main() {
     if let Ok(p) = parsed_html{
         println!("{:?}", p.1);
         let rendered_html = r.render(&p.1);
-        reader(rendered_html);
+        match rendered_html {
+            Ok(html) => reader(html),
+            Err(err) => reader(err)
+        }
     }
 
     let mut should_quit = false;
@@ -76,7 +79,10 @@ fn main() {
                 if let Ok(p) = parsed_html{
                     println!("{:?}", p.1);
                     let rendered_html = r.render(&p.1);
-                    reader(rendered_html);
+                    match rendered_html {
+                        Ok(html) => reader(html),
+                        Err(err) => reader(err)
+                    }
                 }
             },
             _ => println!("Invalid command"),

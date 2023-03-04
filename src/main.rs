@@ -1,8 +1,10 @@
 mod html_adt;
 use std::fs::File;
-use std::io::{BufReader, Read};
+use std::io::Read;
+
+mod ansi_helper;
 mod HTMLParser;
-mod Renderer;
+mod renderer;
 
 fn main() {
     // Read the contents of the index.html file into a string
@@ -14,5 +16,5 @@ fn main() {
     let parsed_html = HTMLParser::parseHTML(&contents);
 
     // Pass the parsed HTML to the renderer
-    Renderer::render(parsed_html);
+    renderer::render(&parsed_html);
 }

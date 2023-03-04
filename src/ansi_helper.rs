@@ -29,6 +29,10 @@ pub mod colours {
     pub const BRIGHT_CYAN: RGB = RGB(41, 184, 219);
 }
 
+pub fn reset_all() -> String {
+    write_code("0m")
+}
+
 pub fn bold_on() -> String {
     write_code("1m")
 }
@@ -43,6 +47,14 @@ pub fn italics_on() -> String {
 
 pub fn italics_off() -> String {
     write_code("23m")
+}
+
+pub fn underline_on() -> String {
+    write_code("4m")
+}
+
+pub fn underline_off() -> String {
+    write_code("24m")
 }
 
 pub fn reset_fg_colour() -> String {

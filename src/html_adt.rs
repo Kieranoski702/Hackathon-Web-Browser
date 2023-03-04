@@ -5,6 +5,14 @@ pub enum Elem {
     STRONG,
     EM,
     H1,
+    H2,
+    H3,
+    H4,
+    H5,
+    HEADER,
+    DIV,
+    NAV,
+    MAIN,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

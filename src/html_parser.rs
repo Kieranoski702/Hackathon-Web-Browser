@@ -140,17 +140,17 @@ fn p_close_certain_tag(desired: Token, i: &str) -> IResult<&str, Token> {
     //println!("START: p_close_certain_tag {}", i);
     let (i, token) = p_close_tag(i)?;
 
-    let desiredElem = match desired {
+    let desired_elem = match desired {
         Token::START(e) => e,
         Token::END(e) => e,
         _ => todo!(),
     };
-    let tokenElem = match desired {
+    let token_elem = match desired {
         Token::START(e) => e,
         Token::END(e) => e,
         _ => todo!(),
     };
-    if tokenElem.eq(&desiredElem) {
+    if token_elem.eq(&desired_elem) {
         //println!("OK: p_close_certain_tag {}", i);
         Ok((i, token))
     } else {
@@ -164,8 +164,22 @@ fn match_elem(name: &str) -> Elem {
     let a = String::from(name).to_lowercase();
     ////println!("hellomatch");
     match a.as_str() {
+        // Format / inline
         "b" => Elem::STRONG,
+        "strong" => Elem::STRONG,
         "i" => Elem::EM,
+        "em" => Elem::EM,
+        "h1" => Elem::H1,
+        "h2" => Elem::H2,
+        "h3" => Elem::H3,
+        "h4" => Elem::H4,
+        "h5" => Elem::H5,
+        // Sectional commands
+        "header" => Elem::HEADER,
+        "div" => Elem::DIV,
+        "nav" => Elem::NAV,
+        "main" => Elem::MAIN,
+
         _ => unimplemented!("HTML tag {} not implemented", a),
     }
 }

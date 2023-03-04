@@ -4,7 +4,7 @@ use std::io::Read;
 
 mod ansi_helper;
 use clap::{Parser, Subcommand};
-mod HtmlParser;
+mod HTMLParser;
 mod renderer;
 mod Requester;
 
@@ -43,6 +43,10 @@ fn main() {
     // Pass the contents of the file to the parser
     let parsed_html = HTMLParser::parseHTML(&contents);
 
+    match parsed_html  {
+        Ok((_,p)) => renderer::render_tokens(&p),
+        _ => todo!()
+    }
+
     // Pass the parsed HTML to the renderer
-    renderer::render(&parsed_html);
 }

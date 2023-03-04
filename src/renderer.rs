@@ -1,11 +1,8 @@
-use crate::html_adt::{HTML, Token, Elem};
+use crate::html_adt::{Token, Elem};
 
 /**
  * Render the HTML.
  */
-pub fn render(html: &HTML) {
-    render_tokens(&html.body.elements);
-}
 
 pub fn render_tokens(tokens: &Vec<Token>) {
     for token in tokens {

@@ -31,7 +31,6 @@ pub enum Token {
     START(Elem, Attrs),
     END(Elem, Attrs),
     TEXT(String),
-    PARAGRAPH,
 }
 
 pub struct Header {}

@@ -5,7 +5,7 @@ use crate::ansi_helper::colours;
 
 #[derive(Default)]
 pub struct Renderer {
-    list_stack: Vec<(Elem, usize)>,
+    _list_stack: Vec<(Elem, usize)>,
 }
 
 impl Renderer {
@@ -19,7 +19,10 @@ impl Renderer {
                     Elem::EM => self.start_italics(),
                     Elem::H1 => self.start_h1(),
                     Elem::H2 => self.start_h2(),
+                    Elem::H3 => self.start_h3(),
+                    Elem::H4 | Elem::H5 => self.start_small_head(),
                     Elem::A => self.start_a(),
+                    Elem::P => self.nl(),
                     _ => String::new()
                 },
                 Token::END(elem, attrs) => match elem {
@@ -27,11 +30,13 @@ impl Renderer {
                     Elem::EM => self.end_italics(),
                     Elem::H1 => self.end_h1(),
                     Elem::H2 => self.end_h2(),
+                    Elem::H3 => self.end_h3(),
+                    Elem::H4 | Elem::H5 => self.end_small_head(),
                     Elem::A => self.end_a(attrs),
+                    Elem::DIV => self.nl(),
                     _ => String::new()
                 },
-                Token::TEXT(text) => String::clone(text),
-                Token::PARAGRAPH => self.paragraph(),
+                Token::TEXT(text) => String::clone(text)
             };
 
             output.push_str(token_str.as_str());
@@ -58,7 +63,7 @@ impl Renderer {
 
     fn start_h1(&self) -> String {
         format!(
-            "{}{}",
+            "{}{}\n",
             ansi_helper::bold_on(),
             ansi_helper::set_fg_colour(&colours::RED)
         )
@@ -77,7 +82,32 @@ impl Renderer {
     }
 
     fn end_h2(&self) -> String {
-        ansi_helper::reset_fg_colour()
+        format!(
+            "{}\n",
+            ansi_helper::reset_fg_colour()
+        )
+    }
+
+    fn start_h3(&self) -> String {
+        ansi_helper::set_fg_colour(&colours::GREEN)
+    }
+
+    fn end_h3(&self) -> String {
+        format!(
+            "{}\n",
+            ansi_helper::reset_fg_colour()
+        )
+    }
+
+    fn start_small_head(&self) -> String {
+        ansi_helper::bold_on()
+    }
+
+    fn end_small_head(&self) -> String {
+        format!(
+            "{}\n",
+            ansi_helper::bold_off()
+        )
     }
 
     fn start_a(&self) -> String {
@@ -95,7 +125,7 @@ impl Renderer {
         )
     }
 
-    fn paragraph(&self) -> String {
+    fn nl(&self) -> String {
         String::from("\n")
     }
 }

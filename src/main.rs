@@ -9,17 +9,20 @@ mod renderer;
 mod Requester;
 
 #[derive(Parser)]
-#[command(author, version, about, long_about = None)]
-#[command(propagate_version = true)]
+#[clap(author, version, about, long_about = None)]
+#[clap(propagate_version = true)]
 struct Cli {
-    #[command(subcommand)]
+    #[clap(subcommand)]
     command: Option<Commands>,
 }
 
 #[derive(Subcommand)]
 enum Commands {
     /// Search for the given url on the internet
-    Search { url: Option<String> },
+    Search {
+        #[clap(value_parser)]
+        url: Option<String>,
+    },
 }
 
 fn main() {

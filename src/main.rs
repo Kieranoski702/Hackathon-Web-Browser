@@ -1,7 +1,9 @@
 mod html_adt;
 use std::fs::File;
 use std::io::Read;
-
+use std::io::Write;
+use std::io::stdin;
+use std::io::stdout;
 mod ansi_helper;
 use clap::{Parser, Subcommand};
 mod HtmlParser;
@@ -45,4 +47,27 @@ fn main() {
 
     // Pass the parsed HTML to the renderer
     renderer::render(&parsed_html);
+
+    let mut should_quit = false;
+    while !should_quit {
+        let input = read_line();
+        match input.trim() {
+            "quit" => should_quit = true,
+            "search" => {
+                let url = read_line();
+                let contents = Requester::request(&url).unwrap();
+                let parsed_html = HTMLParser::parseHTML(&contents);
+                renderer::render(&parsed_html);
+            },
+            _ => println!("Invalid command"),
+        }
+    }
+}
+
+fn read_line() -> String {
+    let mut input = String::new();
+    print!("> ");
+    stdout().flush().unwrap();
+    stdin().read_line(&mut input).unwrap();
+    input
 }

@@ -32,12 +32,12 @@ enum Commands {
 
 fn main() {
     let cli = Cli::parse();
-    let contents: String;
+    let mut contents = String::new();
     match &cli.command {
         Some(Commands::Search { url }) => {
             let url = url.clone().unwrap();
             contents = requester::request(&url).unwrap();
-        }
+        },
         None => {
             // Read the contents of the index.html file into a string
             let mut file = File::open("index.html").unwrap();
@@ -49,7 +49,12 @@ fn main() {
     let parsed_html = HTMLParser::parseHTML(&contents);
 
     // Pass the parsed HTML to the renderer
-    let rendered_html = renderer::render(&parsed_html);
+    let mut r: renderer::Renderer = Default::default();
+    if let Ok(p) = parsed_html{
+        println!("{:?}", p.1);
+        let rendered_html = r.render(&p.1);
+        reader(rendered_html);
+    }
 
     let mut should_quit = false;
     while !should_quit {
@@ -60,8 +65,11 @@ fn main() {
                 let url = read_line();
                 let contents = requester::request(&url).unwrap();
                 let parsed_html = HTMLParser::parseHTML(&contents);
-                let rendered_html = renderer::render(&parsed_html);
-                reader(rendered_html);
+                if let Ok(p) = parsed_html{
+                    println!("{:?}", p.1);
+                    let rendered_html = r.render(&p.1);
+                    reader(rendered_html);
+                }
             },
             _ => println!("Invalid command"),
         }

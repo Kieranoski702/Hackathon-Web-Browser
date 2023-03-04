@@ -8,6 +8,7 @@ pub enum Elem {
     EM,
     P
 }
+
 pub enum Token{
     START(Elem),
     END(Elem),

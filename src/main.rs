@@ -1,12 +1,12 @@
 use clap::{Parser, Subcommand};
+use nom::Finish;
 use std::fs::File;
 use std::io::Read;
-use nom::Finish;
 
-mod HTMLParser;
 mod Requester;
 mod ansi_helper;
 mod html_adt;
+mod html_parser;
 mod renderer;
 
 use html_adt::*;
@@ -38,7 +38,7 @@ fn main() {
     //     }
     //     None => {
     //         // Read the contents of the index.html file into a string
-    //         let mut file = File::open("index.html").unwrap();
+    //         let mut file = ile::open("index.html").unwrap();
     //         file.read_to_string(&mut contents).unwrap();
     //     }
     // }
@@ -55,19 +55,17 @@ fn main() {
     // // Pass the parsed HTML to the renderer
     // renderer::render(&parsed_html);
 
-    let html = "<b>Hello World!</b>";
+    let html = "<b><i>Hello World</i> Hello Ben</b>";
 
-    let parsed = HTMLParser::parseHTML(html).finish();
+    let parsed = html_parser::parse_html(html).finish();
 
     let mut r: renderer::Renderer = Default::default();
 
     if let Ok(p) = parsed {
-        println!("{:?}", p.1);
+        //println!("{:?}", p.1);
 
         r.render(&p.1);
     } else {
-        println!("Err");
+        //println!("Err");
     }
-
-
 }

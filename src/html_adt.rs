@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq, Copy)]
 pub enum Elem {
     STRONG,
     EM,
     H1,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Token {
     START(Elem),
     END(Elem),

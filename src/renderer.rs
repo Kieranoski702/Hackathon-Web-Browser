@@ -2,14 +2,15 @@ use crate::html_adt::{attr_names, Attrs, Elem, Token};
 
 use crate::ansi_helper;
 use crate::ansi_helper::colours;
+use std::error::Error;
 
 #[derive(Default)]
 pub struct Renderer {
-    _list_stack: Vec<(Elem, usize)>,
+    list_stack: Vec<(Elem, usize)>,
 }
 
 impl Renderer {
-    pub fn render(&mut self, tokens: &Vec<Token>) -> String {
+    pub fn render(&mut self, tokens: &Vec<Token>) -> Result<String, Box<dyn Error>> {
         let mut output = String::new();
 
         for token in tokens {
@@ -17,23 +18,29 @@ impl Renderer {
                 Token::START(elem, _attrs) => match elem {
                     Elem::STRONG => self.start_strong(),
                     Elem::EM => self.start_italics(),
+                    Elem::U => self.start_underline(),
                     Elem::H1 => self.start_h1(),
                     Elem::H2 => self.start_h2(),
                     Elem::H3 => self.start_h3(),
                     Elem::H4 | Elem::H5 => self.start_small_head(),
                     Elem::A => self.start_a(),
                     Elem::P => self.nl(),
+                    Elem::UL | Elem::OL => self.start_list(*elem),
+                    Elem::LI => self.start_li()?,
                     _ => String::new(),
                 },
                 Token::END(elem, attrs) => match elem {
                     Elem::STRONG => self.end_strong(),
                     Elem::EM => self.end_italics(),
+                    Elem::U => self.end_underline(),
                     Elem::H1 => self.end_h1(),
                     Elem::H2 => self.end_h2(),
                     Elem::H3 => self.end_h3(),
                     Elem::H4 | Elem::H5 => self.end_small_head(),
                     Elem::A => self.end_a(attrs),
                     Elem::DIV => self.nl(),
+                    Elem::UL | Elem::OL => self.end_list(),
+                    Elem::LI => self.nl(),
                     _ => String::new(),
                 },
                 Token::TEXT(text) => String::clone(text),
@@ -42,7 +49,7 @@ impl Renderer {
             output.push_str(token_str.as_str());
         }
 
-        output
+        Ok(output.trim_end().to_string())
     }
 
     fn start_strong(&self) -> String {
@@ -59,6 +66,14 @@ impl Renderer {
 
     fn end_italics(&self) -> String {
         ansi_helper::italics_off()
+    }
+
+    fn start_underline(&self) -> String {
+        ansi_helper::underline_on()
+    }
+
+    fn end_underline(&self) -> String {
+        ansi_helper::underline_off()
     }
 
     fn start_h1(&self) -> String {
@@ -113,6 +128,33 @@ impl Renderer {
                 .unwrap_or(&String::new()),
             ansi_helper::underline_off()
         )
+    }
+
+    fn start_list(&mut self, elem: Elem) -> String {
+        self.list_stack.push((elem, 1));
+        String::new()
+    }
+
+    fn end_list(&mut self) -> String {
+        self.list_stack.pop();
+        String::new()
+    }
+
+    fn start_li(&mut self) -> Result<String, Box<dyn Error>> {
+        if let Some(last_elem) = self.list_stack.last().cloned() {
+            let spaces = "  ".repeat(self.list_stack.len());
+            match last_elem {
+                (Elem::OL, i) => {
+                    self.list_stack.pop();
+                    self.list_stack.push((Elem::OL, i + 1));
+                    Ok(format!("{}{}. ", spaces, i))
+                }
+                (Elem::UL, _) => Ok(format!("{}• ", spaces)),
+                _ => Err("Invalid elem in list stack")?,
+            }
+        } else {
+            Err("Invalid <li> tag. Not in list.")?
+        }
     }
 
     fn nl(&self) -> String {

@@ -1,12 +1,12 @@
 use clap::{Parser, Subcommand};
 use std::fs::File;
 use std::io::Read;
+use nom::Finish;
 
-mod ansi_helper;
-use clap::{Parser, Subcommand};
 mod HTMLParser;
-mod renderer;
 mod Requester;
+mod ansi_helper;
+mod html_adt;
 mod renderer;
 
 use html_adt::*;
@@ -49,15 +49,25 @@ fn main() {
     // // Pass the parsed HTML to the renderer
     // renderer::render(&parsed_html);
 
-    let tokens = vec![
-        Token::START(Elem::H1),
-        Token::TEXT(String::from("Hello World!")),
-        Token::END(Elem::H1),
-    ];
+    // // Pass the contents of the file to the parser
+    // let parsed_html = HTMLParser::parseHTML(&contents);
 
-    // Pass the contents of the file to the parser
-    let parsed_html = HTMLParser::parseHTML(&contents);
+    // // Pass the parsed HTML to the renderer
+    // renderer::render(&parsed_html);
 
-    // Pass the parsed HTML to the renderer
-    renderer::render(&parsed_html);
+    let html = "<b>Hello World!</b>";
+
+    let parsed = HTMLParser::parseHTML(html).finish();
+
+    let mut r: renderer::Renderer = Default::default();
+
+    if let Ok(p) = parsed {
+        println!("{:?}", p.1);
+
+        r.render(&p.1);
+    } else {
+        println!("Err");
+    }
+
+
 }

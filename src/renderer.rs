@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 use crate::html_adt::{Elem, Token};
 
 use crate::ansi_helper;
@@ -8,13 +7,6 @@ use crate::ansi_helper::colours;
 pub struct Renderer {
     list_depth: usize,
 }
-=======
-use crate::html_adt::{Token, Elem};
-
-/**
- * Render the HTML.
- */
->>>>>>> origin/parser
 
 impl Renderer {
     pub fn render(&mut self, tokens: &Vec<Token>) {

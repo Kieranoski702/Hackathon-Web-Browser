@@ -1,12 +1,12 @@
+use clap::{Parser, Subcommand};
 use std::fs::File;
 use std::io::Read;
-use clap::{Parser, Subcommand};
 
 mod ansi_helper;
 mod html_adt;
 // mod HtmlParser;
-mod renderer;
 mod Requester;
+mod renderer;
 
 use html_adt::*;
 
@@ -48,7 +48,7 @@ fn main() {
     let tokens = vec![
         Token::START(Elem::H1),
         Token::TEXT(String::from("Hello World!")),
-        Token::END(Elem::H1)
+        Token::END(Elem::H1),
     ];
 
     let mut r: renderer::Renderer = Default::default();

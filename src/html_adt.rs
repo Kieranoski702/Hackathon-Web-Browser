@@ -2,11 +2,11 @@ pub enum Token {
     START(Elem),
     END(Elem),
     TEXT(String),
-    PARAGRAPH
+    PARAGRAPH,
 }
 
 pub enum Elem {
     STRONG,
     EM,
-    H1
+    H1,
 }

@@ -1,11 +1,11 @@
-use crate::html_adt::{Token, Elem};
+use crate::html_adt::{Elem, Token};
 
 use crate::ansi_helper;
 use crate::ansi_helper::colours;
 
 #[derive(Default)]
 pub struct Renderer {
-    list_depth: usize
+    list_depth: usize,
 }
 
 impl Renderer {
@@ -23,10 +23,9 @@ impl Renderer {
                     Elem::H1 => self.end_h1(),
                 },
                 Token::TEXT(text) => self.text(text),
-                Token::PARAGRAPH => self.paragraph()
+                Token::PARAGRAPH => self.paragraph(),
             }
         }
-
     }
 
     fn start_strong(&self) {
@@ -63,5 +62,3 @@ impl Renderer {
         println!();
     }
 }
-
-

@@ -12,21 +12,21 @@ pub struct RGB(u8, u8, u8);
 pub mod colours {
     use super::RGB;
 
-    pub const BLACK: RGB            = RGB(0, 0, 0);
-    pub const RED: RGB              = RGB(197, 15, 31);
-    pub const GREEN: RGB            = RGB(19, 161, 14);
-    pub const YELLOW: RGB           = RGB(229, 229, 16);
-    pub const BLUE: RGB             = RGB(36, 114, 200);
-    pub const MAGENTA: RGB          = RGB(188, 63, 188);
-    pub const CYAN: RGB             = RGB(17, 168, 205);
-    pub const WHITE: RGB            = RGB(255, 255, 255);
-    pub const GREY: RGB             = RGB(102, 102, 102);
-    pub const BRIGHT_RED: RGB       = RGB(241, 76, 76);
-    pub const BRIGHT_GREEN: RGB     = RGB(22, 198, 12);
-    pub const BRIGHT_YELLOW: RGB    = RGB(245, 245, 67);
-    pub const BRIGHT_BLUE: RGB      = RGB(59, 120, 234);
-    pub const BRIGHT_MAGENTA: RGB   = RGB(214, 112, 214);
-    pub const BRIGHT_CYAN: RGB      = RGB(41, 184, 219);
+    pub const BLACK: RGB = RGB(0, 0, 0);
+    pub const RED: RGB = RGB(197, 15, 31);
+    pub const GREEN: RGB = RGB(19, 161, 14);
+    pub const YELLOW: RGB = RGB(229, 229, 16);
+    pub const BLUE: RGB = RGB(36, 114, 200);
+    pub const MAGENTA: RGB = RGB(188, 63, 188);
+    pub const CYAN: RGB = RGB(17, 168, 205);
+    pub const WHITE: RGB = RGB(255, 255, 255);
+    pub const GREY: RGB = RGB(102, 102, 102);
+    pub const BRIGHT_RED: RGB = RGB(241, 76, 76);
+    pub const BRIGHT_GREEN: RGB = RGB(22, 198, 12);
+    pub const BRIGHT_YELLOW: RGB = RGB(245, 245, 67);
+    pub const BRIGHT_BLUE: RGB = RGB(59, 120, 234);
+    pub const BRIGHT_MAGENTA: RGB = RGB(214, 112, 214);
+    pub const BRIGHT_CYAN: RGB = RGB(41, 184, 219);
 }
 
 pub fn bold_on() {

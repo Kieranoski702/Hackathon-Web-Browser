@@ -1,42 +1,33 @@
 use std::collections::HashMap;
 
-/**
- * Root HTML structure.
- */
-pub struct HTML {
-    /**
-     * The header of the HTML.
-     */
-    pub head: Header,
-    /**
-     * The body of the HTML.
-     */
-    pub body: Body,
+pub type Attrs = HashMap<String, String>;
+
+pub mod attr_names {
+    pub const HREF: &str = "href";
 }
 
-/**
- * Header structure.
- */
-pub struct Header {}
-
-/**
- * Body structure.
- */
-pub struct Body {
-    /**
-     * The Elements of the body.
-     */
-    pub elements: Vec<Token>
-}
-
-pub enum Token {
-    START(Elem),
-    END(Elem),
-    TEXT(String),
-    PARAGRAPH
-}
-
+#[derive(Clone, Debug, Eq, PartialEq, Copy)]
 pub enum Elem {
     STRONG,
-    EM
+    EM,
+    H1,
+    H2,
+    H3,
+    H4,
+    H5,
+    HEADER,
+    DIV,
+    NAV,
+    MAIN,
+    A,
 }
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum Token {
+    START(Elem, Attrs),
+    END(Elem, Attrs),
+    TEXT(String),
+    PARAGRAPH,
+}
+
+pub struct Header {}

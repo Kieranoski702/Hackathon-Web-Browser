@@ -1,7 +1,7 @@
 use std::io::{BufRead, BufReader};
+use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::str;
-use std::io::{Read, Write};
 
 #[derive(Debug)]
 pub enum HttpError {
@@ -31,7 +31,12 @@ pub fn request(url: &str) -> Result<String, HttpError> {
     let mut stream = TcpStream::connect(format!("{}:{}", host, port)).unwrap();
 
     // Send an HTTP GET request for the specified URL
-    let request = format!("GET {} {}{}", path, protocol, "\r\nHost: ".to_string() + host + "\r\n\r\n");
+    let request = format!(
+        "GET {} {}{}",
+        path,
+        protocol,
+        "\r\nHost: ".to_string() + host + "\r\n\r\n"
+    );
     stream.write(request.as_bytes()).unwrap();
 
     // Read the response from the server into a string

@@ -1,8 +1,8 @@
-use crate::html_adt::{Attrs, Elem, Header, Token};
+use crate::html_adt::{Attrs, Elem, Token};
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_while};
-use nom::character::complete::{anychar, char, multispace0};
-use nom::combinator::{fail, peek};
+use nom::character::complete::{anychar, char, multispace0,none_of};
+use nom::combinator::{fail, peek,opt};
 use nom::multi::{many0, many_till};
 use nom::IResult;
 
@@ -10,22 +10,18 @@ use nom::IResult;
  * Parse a HTML file into a HTML object.
  */
 pub fn parse_html<'a>(i: &'a str) -> IResult<&'a str, Vec<Token>> {
-    //println!("START: p_html {} ", i);
-    // let (i, _) = opt(pHTMLOpenElem)(i)?;
-    // let (i, _) = opt(pHeader)(i)?;
-    // let (i, _) = opt(pHTMLCloseElem)(i)?;
-
+    println!("START: p_html {} ", i);
+     let (i, _) = opt(|n| p_open_tag_by_elem(Elem::HTML,n))(i)?;
+     let (i, _) = opt(|n| p_skip_tag_by_elem(Elem::HEAD,n))(i)?;
+     let (i, _) = opt(|n| p_open_tag_by_elem(Elem::BODY,n))(i)?;
     let (i, body) = p_body(i)?;
-    // let (i, _) = opt(pHTMLCloseElem)(i)?;
+     let (i, _) = opt(|n| p_close_tag_by_elem(Elem::BODY,n))(i)?;
+     let (i, _) = opt(|n| p_close_tag_by_elem(Elem::HTML,n))(i)?;
 
-    //println!("OK: p_html {} ", i);
+    println!("OK: p_html {} ", i);
     Ok((i, body))
 }
 
-#[allow(dead_code)]
-fn p_header(i: &str) -> IResult<&str, Header> {
-    todo!();
-}
 
 fn p_body(i: &str) -> IResult<&str, Vec<Token>> {
     //println!("START: p_body {} ", i);
@@ -48,16 +44,6 @@ where
     let (i, _) = multispace0(i)?;
 
     Ok((i, res))
-}
-
-#[allow(dead_code)]
-fn p_html_open_tag(i: &str) -> IResult<&str, Token> {
-    todo!();
-}
-
-#[allow(dead_code)]
-fn p_html_close_tag(i: &str) -> IResult<&str, Token> {
-    todo!();
 }
 
 fn p_text(i: &str) -> IResult<&str, Vec<Token>> {
@@ -138,7 +124,6 @@ fn p_close_tag(i: &str) -> IResult<&str, Token> {
 }
 
 fn p_close_certain_tag(desired: Token, i: &str) -> IResult<&str, Token> {
-    //println!("START: p_close_certain_tag {}", i);
     let (i, token) = p_close_tag(i)?;
 
     let desired_elem = match desired {
@@ -146,25 +131,18 @@ fn p_close_certain_tag(desired: Token, i: &str) -> IResult<&str, Token> {
         Token::END(e, _) => e,
         _ => todo!(),
     };
-    let token_elem = match token {
-        Token::START(e, _) => e,
-        Token::END(e, _) => e,
-        _ => todo!(),
-    };
-    if token_elem.eq(&desired_elem) {
-        //println!("OK: p_close_certain_tag {}", i);
-        Ok((i, token))
-    } else {
-        //println!("FAIL: p_close_certain_tag {}", i);
 
-        fail("mismached element")
-    }
+    p_close_tag_by_elem(desired_elem,i)
 }
 
 fn match_elem(name: &str) -> Elem {
     let a = String::from(name).to_lowercase();
     ////println!("hellomatch");
     match a.as_str() {
+        // Boilerplate
+        "html" => Elem::HTML,
+        "body" => Elem::BODY,
+        "head" => Elem::HEAD,
         // Format / inline
         "b" => Elem::STRONG,
         "strong" => Elem::STRONG,
@@ -184,4 +162,40 @@ fn match_elem(name: &str) -> Elem {
 
         _ => unimplemented!("HTML tag {} not implemented", a),
     }
+}
+
+
+fn p_open_tag_by_elem(elem: Elem, i: &str) -> IResult<&str,Token> {
+    let (i, token) = p_open_tag(i)?;
+    let token_elem = match token {
+        Token::START(e, _) => e,
+        _ => panic!(),
+    };
+    if token_elem.eq(&elem) {
+        return Ok((i, token))
+    } else {
+        return fail("")
+    }
+}
+
+
+fn p_close_tag_by_elem(elem: Elem, i: &str) -> IResult<&str,Token> {
+    let (i, token) = p_close_tag(i)?;
+    let token_elem = match token {
+        Token::END(e, _) => e,
+        _ => panic!(),
+    };
+    if token_elem.eq(&elem) {
+        return Ok((i, token))
+    } else {
+        return fail("")
+    }
+}
+
+
+fn p_skip_tag_by_elem(elem: Elem, i: &str) -> IResult<&str,()> {
+    let (i,_) = p_open_tag_by_elem(elem,i)?;
+    let (i,_) = many_till(none_of(""),|n| p_close_tag_by_elem(elem,n))(i)?;
+    let (i,_) = p_close_tag_by_elem(elem,i)?;
+    return Ok((i,()))
 }

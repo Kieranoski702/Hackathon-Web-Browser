@@ -20,6 +20,10 @@ pub enum Elem {
     NAV,
     MAIN,
     A,
+    HEAD,
+    P,
+    HTML,
+    BODY
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

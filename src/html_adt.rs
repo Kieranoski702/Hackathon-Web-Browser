@@ -21,6 +21,9 @@ pub enum Elem {
     MAIN,
     A,
     P,
+    OL,
+    UL,
+    LI
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

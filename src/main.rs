@@ -1,15 +1,17 @@
-mod html_adt;
+use clap::{Parser, Subcommand};
+use nom::Finish;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 use std::io::stdin;
 use std::io::stdout;
+mod HTMLParser;
 mod ansi_helper;
-use clap::{Parser, Subcommand};
 use termion::{clear, cursor, terminal_size};
-mod HtmlParser;
+mod html_adt;
 mod renderer;
 mod requester;
+use html_adt::*;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]

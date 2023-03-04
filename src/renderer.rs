@@ -17,6 +17,7 @@ impl Renderer {
                 Token::START(elem, _attrs) => match elem {
                     Elem::STRONG => self.start_strong(),
                     Elem::EM => self.start_italics(),
+                    Elem::U => self.start_underline(),
                     Elem::H1 => self.start_h1(),
                     Elem::H2 => self.start_h2(),
                     Elem::H3 => self.start_h3(),
@@ -28,6 +29,7 @@ impl Renderer {
                 Token::END(elem, attrs) => match elem {
                     Elem::STRONG => self.end_strong(),
                     Elem::EM => self.end_italics(),
+                    Elem::U => self.end_underline(),
                     Elem::H1 => self.end_h1(),
                     Elem::H2 => self.end_h2(),
                     Elem::H3 => self.end_h3(),
@@ -59,6 +61,14 @@ impl Renderer {
 
     fn end_italics(&self) -> String {
         ansi_helper::italics_off()
+    }
+
+    fn start_underline(&self) -> String {
+        ansi_helper::underline_on()
+    }
+
+    fn end_underline(&self) -> String {
+        ansi_helper::underline_off()
     }
 
     fn start_h1(&self) -> String {

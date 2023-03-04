@@ -10,6 +10,7 @@ pub mod attr_names {
 pub enum Elem {
     STRONG,
     EM,
+    U,
     H1,
     H2,
     H3,

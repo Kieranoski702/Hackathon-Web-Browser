@@ -3,26 +3,30 @@ use std::fs::File;
 use std::io::Read;
 
 mod ansi_helper;
-mod html_adt;
-// mod HtmlParser;
+use clap::{Parser, Subcommand};
+mod HTMLParser;
+mod renderer;
 mod Requester;
 mod renderer;
 
 use html_adt::*;
 
-// #[derive(Parser)]
-// #[command(author, version, about, long_about = None)]
-// #[command(propagate_version = true)]
-// struct Cli {
-//     #[command(subcommand)]
-//     command: Option<Commands>,
-// }
+#[derive(Parser)]
+#[clap(author, version, about, long_about = None)]
+#[clap(propagate_version = true)]
+struct Cli {
+    #[clap(subcommand)]
+    command: Option<Commands>,
+}
 
-// #[derive(Subcommand)]
-// enum Commands {
-//     /// Search for the given url on the internet
-//     Search { url: Option<String> },
-// }
+#[derive(Subcommand)]
+enum Commands {
+    /// Search for the given url on the internet
+    Search {
+        #[clap(value_parser)]
+        url: Option<String>,
+    },
+}
 
 fn main() {
     // let cli = Cli::parse();
@@ -51,7 +55,9 @@ fn main() {
         Token::END(Elem::H1),
     ];
 
-    let mut r: renderer::Renderer = Default::default();
+    // Pass the contents of the file to the parser
+    let parsed_html = HTMLParser::parseHTML(&contents);
 
-    r.render(&tokens);
+    // Pass the parsed HTML to the renderer
+    renderer::render(&parsed_html);
 }

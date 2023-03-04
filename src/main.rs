@@ -1,17 +1,16 @@
+mod HTMLParser;
+mod ansi_helper;
+mod html_adt;
+mod renderer;
+mod requester;
+
 use clap::{Parser, Subcommand};
-use nom::Finish;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 use std::io::stdin;
 use std::io::stdout;
-mod HTMLParser;
-mod ansi_helper;
 use termion::{clear, cursor, terminal_size};
-mod html_adt;
-mod renderer;
-mod requester;
-use html_adt::*;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -80,21 +79,7 @@ fn main() {
 fn read_line() -> String {
     let mut input = String::new();
     print!("> ");
-    stdout().flush().unwrlet html = "<b>Hello World!</b>";
-
-    let parsed = HTMLParser::parseHTML(html).finish();
-
-    let mut r: renderer::Renderer = Default::default();
-
-    if let Ok(p) = parsed {
-        println!("{:?}", p.1);
-
-        r.render(&p.1);
-    } else {
-        println!("Err");
-    }
-
-ap();
+    stdout().flush().unwrap();
     stdin().read_line(&mut input).unwrap();
     input
 }

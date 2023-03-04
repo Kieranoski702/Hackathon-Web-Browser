@@ -10,7 +10,7 @@ use nom::IResult;
  * Parse a HTML file into a HTML object.
  */
 pub fn parse_html<'a>(i: &'a str) -> IResult<&'a str, Vec<Token>> {
-    println!("START: p_html {} ", i);
+    //println!("START: p_html {} ", i);
      let (i, _) = opt(|n| p_open_tag_by_elem(Elem::HTML,n))(i)?;
      let (i, _) = opt(|n| p_skip_tag_by_elem(Elem::HEAD,n))(i)?;
      let (i, _) = opt(|n| p_open_tag_by_elem(Elem::BODY,n))(i)?;
@@ -18,7 +18,7 @@ pub fn parse_html<'a>(i: &'a str) -> IResult<&'a str, Vec<Token>> {
      let (i, _) = opt(|n| p_close_tag_by_elem(Elem::BODY,n))(i)?;
      let (i, _) = opt(|n| p_close_tag_by_elem(Elem::HTML,n))(i)?;
 
-    println!("OK: p_html {} ", i);
+    //println!("OK: p_html {} ", i);
     Ok((i, body))
 }
 

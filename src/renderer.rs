@@ -9,9 +9,11 @@ pub struct Renderer {
 }
 
 impl Renderer {
-    pub fn render(&mut self, tokens: &Vec<Token>) {
+    pub fn render(&mut self, tokens: &Vec<Token>) -> String {
+        let mut output = String::new();
+
         for token in tokens {
-            match token {
+            let token_str = match token {
                 Token::START(elem) => match elem {
                     Elem::STRONG => self.start_strong(),
                     Elem::EM => self.start_italics(),
@@ -22,43 +24,49 @@ impl Renderer {
                     Elem::EM => self.end_italics(),
                     Elem::H1 => self.end_h1(),
                 },
-                Token::TEXT(text) => self.text(text),
+                Token::TEXT(text) => String::clone(text),
                 Token::PARAGRAPH => self.paragraph(),
-            }
+            };
+
+            output.push_str(token_str.as_str());
         }
+
+        output
     }
 
-    fn start_strong(&self) {
-        ansi_helper::bold_on();
+    fn start_strong(&self) -> String {
+        ansi_helper::bold_on()
     }
 
-    fn end_strong(&self) {
-        ansi_helper::bold_off();
+    fn end_strong(&self) -> String {
+        ansi_helper::bold_off()
     }
 
-    fn start_italics(&self) {
-        ansi_helper::italics_on();
+    fn start_italics(&self) -> String {
+        ansi_helper::italics_on()
     }
 
-    fn end_italics(&self) {
-        ansi_helper::italics_off();
+    fn end_italics(&self) -> String {
+        ansi_helper::italics_off()
     }
 
-    fn start_h1(&self) {
-        ansi_helper::bold_on();
-        ansi_helper::set_fg_colour(&colours::RED);
+    fn start_h1(&self) -> String {
+        format!(
+            "{}{}",
+            ansi_helper::bold_on(),
+            ansi_helper::set_fg_colour(&colours::RED)
+        )
     }
 
-    fn end_h1(&self) {
-        ansi_helper::bold_off();
-        ansi_helper::reset_fg_colour();
+    fn end_h1(&self) -> String {
+        format!(
+            "{}{}",
+            ansi_helper::bold_off(),
+            ansi_helper::reset_fg_colour()
+        )
     }
 
-    fn text(&self, t: &String) {
-        print!("{}", t);
-    }
-
-    fn paragraph(&self) {
-        println!();
+    fn paragraph(&self) -> String {
+        return String::from("\n");
     }
 }

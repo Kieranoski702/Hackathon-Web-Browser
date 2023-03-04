@@ -6,12 +6,11 @@ mod requester;
 
 use clap::{Parser, Subcommand};
 use std::fs::File;
-use std::io::{Read, stdin, stdout, Write};
-use termion::{clear, cursor, terminal_size};
+use std::io::{stdin, stdout, Read, Write};
 use termion::event::{Event, Key};
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
-
+use termion::{clear, cursor, terminal_size};
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -30,7 +29,8 @@ enum Commands {
     },
     Open {
         #[clap(value_parser)]
-        file: Option<String>,}
+        file: Option<String>,
+    },
 }
 
 fn main() {
@@ -40,12 +40,12 @@ fn main() {
         Some(Commands::Search { url }) => {
             let url = url.clone().unwrap();
             contents = requester::request(&url).unwrap();
-        },
+        }
         Some(Commands::Open { file }) => {
             let file = file.clone().unwrap();
             let mut file = File::open(file).unwrap();
             file.read_to_string(&mut contents).unwrap();
-        },
+        }
         None => {
             // Read the contents of the index.html file into a string
             let mut file = File::open("index.html").unwrap();
@@ -58,7 +58,7 @@ fn main() {
 
     // Pass the parsed HTML to the renderer
     let mut r: renderer::Renderer = Default::default();
-    if let Ok(p) = parsed_html{
+    if let Ok(p) = parsed_html {
         println!("{:?}", p.1);
         let rendered_html = r.render(&p.1);
         reader(rendered_html);
@@ -73,16 +73,15 @@ fn main() {
                 let url = read_line();
                 let contents = requester::request(&url).unwrap();
                 let parsed_html = html_parser::parse_html(&contents);
-                if let Ok(p) = parsed_html{
+                if let Ok(p) = parsed_html {
                     println!("{:?}", p.1);
                     let rendered_html = r.render(&p.1);
                     reader(rendered_html);
                 }
-            },
+            }
             _ => println!("Invalid command"),
         }
     }
-
 }
 
 fn read_line() -> String {
@@ -112,7 +111,10 @@ fn reader(rendered_html: String) {
         let max_lines = term_height - 2; // leave 1 line for input prompt and 1 line for status message
 
         // print the current viewable portion of the HTML
-        let html_lines = rendered_html.lines().skip(scroll_offset).take(max_lines.into());
+        let html_lines = rendered_html
+            .lines()
+            .skip(scroll_offset)
+            .take(max_lines.into());
         for line in html_lines {
             writeln!(stdout, "{}", line).unwrap();
             write!(stdout, "\r").unwrap();
@@ -129,26 +131,25 @@ fn reader(rendered_html: String) {
                 Event::Key(key) => match key {
                     Key::Char('q') => {
                         break;
-                    },
+                    }
                     Key::Up => {
                         // scroll up
                         if scroll_offset > 0 {
                             scroll_offset -= 1;
                         }
-                    },
+                    }
                     Key::Down => {
                         // scroll down
                         scroll_offset += 1;
                         if scroll_offset > rendered_html.lines().count() {
                             scroll_offset = rendered_html.lines().count();
                         }
-                    },
+                    }
                     _ => (),
                 },
                 _ => (),
             }
         }
-
     }
 
     // disable raw mode before returning

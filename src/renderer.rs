@@ -1,4 +1,4 @@
-use crate::html_adt::{Elem, Token, Attrs, attr_names};
+use crate::html_adt::{attr_names, Attrs, Elem, Token};
 
 use crate::ansi_helper;
 use crate::ansi_helper::colours;
@@ -23,7 +23,7 @@ impl Renderer {
                     Elem::H4 | Elem::H5 => self.start_small_head(),
                     Elem::A => self.start_a(),
                     Elem::P => self.nl(),
-                    _ => String::new()
+                    _ => String::new(),
                 },
                 Token::END(elem, attrs) => match elem {
                     Elem::STRONG => self.end_strong(),
@@ -34,9 +34,9 @@ impl Renderer {
                     Elem::H4 | Elem::H5 => self.end_small_head(),
                     Elem::A => self.end_a(attrs),
                     Elem::DIV => self.nl(),
-                    _ => String::new()
+                    _ => String::new(),
                 },
-                Token::TEXT(text) => String::clone(text)
+                Token::TEXT(text) => String::clone(text),
             };
 
             output.push_str(token_str.as_str());
@@ -82,10 +82,7 @@ impl Renderer {
     }
 
     fn end_h2(&self) -> String {
-        format!(
-            "{}\n",
-            ansi_helper::reset_fg_colour()
-        )
+        format!("{}\n", ansi_helper::reset_fg_colour())
     }
 
     fn start_h3(&self) -> String {
@@ -93,10 +90,7 @@ impl Renderer {
     }
 
     fn end_h3(&self) -> String {
-        format!(
-            "{}\n",
-            ansi_helper::reset_fg_colour()
-        )
+        format!("{}\n", ansi_helper::reset_fg_colour())
     }
 
     fn start_small_head(&self) -> String {
@@ -104,23 +98,19 @@ impl Renderer {
     }
 
     fn end_small_head(&self) -> String {
-        format!(
-            "{}\n",
-            ansi_helper::bold_off()
-        )
+        format!("{}\n", ansi_helper::bold_off())
     }
 
     fn start_a(&self) -> String {
-        format!(
-            "{}[",
-            ansi_helper::underline_on()
-        )
+        format!("{}[", ansi_helper::underline_on())
     }
 
     fn end_a(&self, attrs: &Attrs) -> String {
         format!(
             " {}]{}",
-            attrs.get(&String::from(attr_names::HREF)).unwrap_or(&String::new()),
+            attrs
+                .get(&String::from(attr_names::HREF))
+                .unwrap_or(&String::new()),
             ansi_helper::underline_off()
         )
     }

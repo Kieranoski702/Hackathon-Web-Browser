@@ -23,7 +23,7 @@ pub enum Elem {
     HEAD,
     P,
     HTML,
-    BODY
+    BODY,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

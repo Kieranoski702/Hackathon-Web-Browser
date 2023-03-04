@@ -177,6 +177,7 @@ fn match_elem(name: &str) -> Elem {
         "h5" => Elem::H5,
         // Sectional commands
         "header" => Elem::HEADER,
+        "p" => Elem::P,
         "div" => Elem::DIV,
         "nav" => Elem::NAV,
         "main" => Elem::MAIN,

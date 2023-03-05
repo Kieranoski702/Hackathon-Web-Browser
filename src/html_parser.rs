@@ -10,7 +10,7 @@ use regex::Regex;
 use std::borrow::Cow;
 
 pub fn parse_html<'a>(i: &'a str) -> IResult<Cow<'a, str>, Vec<Token>> {
-    let parsed = remove_comments(i);
+    let parsed = pre_process(i);
     println!("{}", parsed);
     match parse_inner(&parsed) {
         Ok((_, tokens)) => Ok((Cow::from(i), tokens)),
@@ -18,12 +18,12 @@ pub fn parse_html<'a>(i: &'a str) -> IResult<Cow<'a, str>, Vec<Token>> {
     }
 }
 
-fn remove_comments(i: &str) -> Cow<'_, str> {
+fn pre_process(i: &str) -> Cow<'_, str> {
     lazy_static! {
-        static ref COMMENT_RE: Regex = Regex::new(r"(?s)<!--.*-->").unwrap();
+        static ref REMOVE_RE: Regex = Regex::new(r"(?:(?s)<!--.*-->)|<![^>]*>").unwrap();
     }
 
-    COMMENT_RE.replace_all(i, "")
+    REMOVE_RE.replace_all(i, "")
 }
 
 /**

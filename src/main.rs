@@ -58,12 +58,16 @@ fn main() {
 
     // Pass the parsed HTML to the renderer
     let mut r: renderer::Renderer = Default::default();
-    if let Ok(p) = parsed_html {
-        println!("{:?}", p.1);
-        let rendered_html = r.render(&p.1);
-        match rendered_html {
-            Ok(html) => reader(html),
-            Err(err) => reader(format!("{}",  err))
+    match parsed_html {
+        Ok(p) => {
+            let rendered_html = r.render(&p.1);
+            match rendered_html {
+                Ok(html) => reader(html),
+                Err(err) => reader(format!("{}",  err))
+            }
+        },
+        Err(e) => {
+            reader(format!("{}", e));
         }
     }
 

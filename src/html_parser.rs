@@ -205,9 +205,13 @@ fn p_close_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, Token> {
 }
 
 fn p_skip_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, ()> {
+    //println!("START: skipping ({:#?}) : {}",elem,i);
     let (i, _) = p_open_tag_by_elem(elem, i)?;
+
     let (i, _) = many_till(none_of(""), |n| p_close_tag_by_elem(elem, n))(i)?;
-    //let (i, _) = p_close_tag_by_elem(elem, i)?;
+    let (i,_) = opt(|n| p_close_tag_by_elem(elem,n))(i)?;
+
+    //println!("OK: skipping ({:#?}) : {}",elem,i);
     return Ok((i, ()));
 }
 

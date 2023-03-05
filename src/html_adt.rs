@@ -21,10 +21,13 @@ pub enum Elem {
     NAV,
     MAIN,
     A,
+    HEAD,
     P,
+    HTML,
+    BODY,
     OL,
     UL,
-    LI
+    LI,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

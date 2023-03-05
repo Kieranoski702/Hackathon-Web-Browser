@@ -153,6 +153,7 @@ fn match_elem(name: &str) -> Elem {
         "b" => Elem::STRONG,
         "strong" => Elem::STRONG,
         "i" => Elem::EM,
+        "u" => Elem::U,
         "em" => Elem::EM,
         "h1" => Elem::H1,
         "h2" => Elem::H2,

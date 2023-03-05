@@ -229,7 +229,7 @@ fn p_close_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, Token> {
     let (i, token) = p_close_tag(i)?;
     // println!("hello2");
     let token_elem = match token {
-        Token::START(e, _) => e,
+        //Token::START(e, _) => e,
         Token::END(e, _) => e,
         _ => panic!(),
     };

@@ -1,15 +1,35 @@
 use crate::html_adt::{Attrs, Elem, Token};
+use lazy_static::lazy_static;
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_while};
 use nom::character::complete::{anychar, char, multispace0, none_of};
 use nom::combinator::{eof, fail, opt, peek};
 use nom::multi::{many0, many1, many_till};
 use nom::IResult;
+use regex::Regex;
+use std::borrow::Cow;
+
+pub fn parse_html<'a>(i: &'a str) -> IResult<Cow<'a, str>, Vec<Token>> {
+    let parsed = remove_comments(i);
+    println!("{}", parsed);
+    match parse_inner(&parsed) {
+        Ok((_, tokens)) => Ok((Cow::from(i), tokens)),
+        Err(_) => fail(Cow::from(i))
+    }
+}
+
+fn remove_comments(i: &str) -> Cow<'_, str> {
+    lazy_static! {
+        static ref COMMENT_RE: Regex = Regex::new(r"(?s)<!--.*-->").unwrap();
+    }
+
+    COMMENT_RE.replace_all(i, "")
+}
 
 /**
  * Parse a HTML file into a HTML object.
  */
-pub fn parse_html<'a>(i: &'a str) -> IResult<&'a str, Vec<Token>> {
+fn parse_inner<'a>(i: &'a str) -> IResult<&'a str, Vec<Token>> {
     // println!("START: p_html {} ", i);
     let (i, _) = opt(|n| p_open_tag_by_elem(Elem::HTML, n))(i)?;
     let (i, _) = opt(|n| p_skip_tag_by_elem(Elem::HEAD, n))(i)?;

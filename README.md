@@ -7,18 +7,10 @@ Most webpages will not work as they have tags or characters that the parser cann
 
 ## General information
 
-* Parser
-    * HTML parser -- XML parser
-* Render
-* Common interface
-* Requester
-
-
-This project is written by **group 20**:
-
-- hc240 - Hyochan Cho
-- nd60 - Niklas Dewally
-- kf77  - Kieran Fowlds
+This project is written by:
+- Ben Vardy
+- Niklas Dewally
+- Kieran Fowlds
 
 
 ## Installation and usage

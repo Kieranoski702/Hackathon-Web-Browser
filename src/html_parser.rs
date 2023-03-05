@@ -11,7 +11,7 @@ use std::borrow::Cow;
 
 pub fn parse_html<'a>(i: &'a str) -> IResult<Cow<'a, str>, Vec<Token>> {
     let parsed = pre_process(i);
-    println!("{}", parsed);
+    //println!("{}", parsed);
     match parse_inner(&parsed) {
         Ok((_, tokens)) => Ok((Cow::from(i), tokens)),
         Err(_) => fail(Cow::from(i))
@@ -123,9 +123,16 @@ fn p_open_tag(i: &str) -> IResult<&str, Token> {
     let (i, _) = multispace0(i)?;
 
     let elem = match_elem(name);
+    match elem {
+        None => {
+            return fail("Unknown");
+        },
+        Some(e) => {
+            // println!("OK: p_open_tag ({}) {}", name,i);
+            return Ok((i, Token::END(e, Attrs::new())));
+        }
+    }
 
-    // println!("OK: p_open_tag {}", i);
-    return Ok((i, Token::START(elem,attrs)));
 }
 
 fn p_close_tag(i: &str) -> IResult<&str, Token> {
@@ -143,9 +150,15 @@ fn p_close_tag(i: &str) -> IResult<&str, Token> {
     // println!("foo3");
 
     let elem = match_elem(name);
-
-    // println!("OK: p_close_tag ({}) {}", name,i);
-    return Ok((i, Token::END(elem, Attrs::new())));
+    match elem {
+        None => {
+            return fail("Unknown");
+        },
+        Some(e) => {
+            // println!("OK: p_close_tag ({}) {}", name,i);
+            return Ok((i, Token::END(e, Attrs::new())));
+        }
+    }
 }
 
 fn p_close_certain_tag(desired: Token, i: &str) -> IResult<&str, Token> {
@@ -161,39 +174,39 @@ fn p_close_certain_tag(desired: Token, i: &str) -> IResult<&str, Token> {
     return Ok((i, token));
 }
 
-fn match_elem(name: &str) -> Elem {
+fn match_elem(name: &str) -> Option<Elem> {
     let a = String::from(name).to_lowercase();
     // println!("hellomatch");
     match a.as_str() {
         // Boilerplate
-        "html" => Elem::HTML,
-        "body" => Elem::BODY,
-        "head" => Elem::HEAD,
+        "html"    => Some(Elem::HTML),
+        "body"    => Some(Elem::BODY),
+        "head"    => Some(Elem::HEAD),
         // Format / inline
-        "b" => Elem::STRONG,
-        "strong" => Elem::STRONG,
-        "i" => Elem::EM,
-        "u" => Elem::U,
-        "em" => Elem::EM,
-        "h1" => Elem::H1,
-        "h2" => Elem::H2,
-        "h3" => Elem::H3,
-        "h4" => Elem::H4,
-        "h5" => Elem::H5,
+        "b"       => Some(Elem::STRONG),
+        "strong"  => Some(Elem::STRONG),
+        "i"       => Some(Elem::EM),
+        "u"       => Some(Elem::U),
+        "em"      => Some(Elem::EM),
+        "h1"      => Some(Elem::H1),
+        "h2"      => Some(Elem::H2),
+        "h3"      => Some(Elem::H3),
+        "h4"      => Some(Elem::H4),
+        "h5"      => Some(Elem::H5),
         // Sectional commands
-        "header" => Elem::HEADER,
-        "p" => Elem::P,
-        "div" => Elem::DIV,
-        "nav" => Elem::NAV,
-        "main" => Elem::MAIN,
-        "a" => Elem::A,
-        "li" => Elem::LI,
-        "ol" => Elem::OL,
-        "ul" => Elem::UL,
-        "section" => Elem::DIV,
-        "br" => Elem::BR,
+        "header"  => Some(Elem::HEADER),
+        "p"       => Some(Elem::P),
+        "div"     => Some(Elem::DIV),
+        "nav"     => Some(Elem::NAV),
+        "main"    => Some(Elem::MAIN),
+        "a"       => Some(Elem::A),
+        "li"      => Some(Elem::LI),
+        "ol"      => Some(Elem::OL),
+        "ul"      => Some(Elem::UL),
+        "section" => Some(Elem::DIV),
+        "br"      => Some(Elem::BR),
 
-        _ => unimplemented!("HTML tag {} not implemented", a),
+        _ => None
     }
 }
 
@@ -201,7 +214,8 @@ fn p_open_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, Token> {
     let (i, token) = p_open_tag(i)?;
     let token_elem = match token {
         Token::START(e, _) => e,
-        _ => panic!(),
+        Token::END(e, _) => e,
+        _ => todo!(),
     };
     if token_elem.eq(&elem) {
         return Ok((i, token));
@@ -215,6 +229,7 @@ fn p_close_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, Token> {
     let (i, token) = p_close_tag(i)?;
     // println!("hello2");
     let token_elem = match token {
+        Token::START(e, _) => e,
         Token::END(e, _) => e,
         _ => panic!(),
     };
@@ -301,4 +316,8 @@ fn p_single_quotes(i:&str) -> IResult<&str,String> {
     let (i,_) = char('\'')(i)?;
     let s : String= value.into_iter().collect();
     return Ok((i,s));
+}
+
+fn disco(){
+    panic!()
 }

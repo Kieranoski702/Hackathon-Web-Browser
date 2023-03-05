@@ -11,7 +11,7 @@ use std::borrow::Cow;
 
 pub fn parse_html<'a>(i: &'a str) -> IResult<Cow<'a, str>, Vec<Token>> {
     let parsed = pre_process(i);
-    println!("{}", parsed);
+    // println!("{}", parsed);
     match parse_inner(&parsed) {
         Ok((_, tokens)) => Ok((Cow::from(i), tokens)),
         Err(_) => fail(Cow::from(i))
@@ -111,7 +111,6 @@ fn p_elem(i: &str) -> IResult<&str, Vec<Token>> {
 }
 
 fn p_open_tag(i: &str) -> IResult<&str, Token> {
-    // println!("START: p_open_tag {}", i);
     let (i, _) = multispace0(i)?;
     let (i, _) = char('<')(i)?;
     let (i, _) = multispace0(i)?;
@@ -229,7 +228,9 @@ fn p_skip_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, ()> {
     //println!("START: skipping ({:#?}) : {}",elem,i);
     let (i, _) = p_open_tag_by_elem(elem, i)?;
 
-    let (i, _) = many_till(none_of(""), |n| p_close_tag_by_elem(elem, n))(i)?;
+    println!("BBB");
+    let (i, thing) = many_till(anychar, |n| p_close_tag_by_elem(elem, n))(i)?;
+    println!("AAAAAAAAAAAAAA {}", thing.0.iter().collect::<String>());
     let (i,_) = opt(|n| p_close_tag_by_elem(elem,n))(i)?;
 
     //println!("OK: skipping ({:#?}) : {}",elem,i);

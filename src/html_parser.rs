@@ -43,7 +43,7 @@ fn parse_inner<'a>(i: &'a str) -> IResult<&'a str, Vec<Token>> {
 
 fn p_body(i: &str) -> IResult<&str, Vec<Token>> {
     // println!("START: p_body {} ", i);
-    let (i, content) = many1(alt((p_elem, p_text)))(i)?;
+    let (i, content) = many1(alt((p_skip,p_elem, p_text)))(i)?;
 
     // Oh no , content is a Vec<Vec<Token>>
     // https://users.rust-lang.org/t/flatten-a-vec-vec-t-to-a-vec-t/24526
@@ -75,13 +75,21 @@ fn p_text(i: &str) -> IResult<&str, Vec<Token>> {
 }
 
 
+fn p_skip(i:&str) -> IResult<&str,Vec<Token>> {
+    let (i,_) = alt((|n|p_skip_tag_by_elem(Elem::STYLE, n),
+    |n|p_skip_tag_by_elem(Elem::SCRIPT, n),
+    |n|p_skip_tag_by_elem(Elem::META, n)))(i)?;
+
+    Ok((i,Vec::new()))
+}
+
 fn p_elem(i: &str) -> IResult<&str, Vec<Token>> {
     // println!("START: p_elem {}", i);
     let (i, _) = multispace0(i)?;
     let (i, start) = p_open_tag(i)?;
     // println!("ELEM FOUND open tag {:#?}", start);
     let (i, _) = multispace0(i)?;
-    let (i, inner) = many0(alt((p_elem, p_text)))(i)?;
+    let (i, inner) = many0(alt((p_skip,p_elem, p_text)))(i)?;
     // println!("ELEM FOUND inner {:#?}", inner);
     let (i, _) = multispace0(i)?;
     let (i, close) = opt(|n| p_close_certain_tag(Token::clone(&start), n))(i)?;
@@ -205,6 +213,9 @@ fn match_elem(name: &str) -> Option<Elem> {
         "ul"      => Some(Elem::UL),
         "section" => Some(Elem::DIV),
         "br"      => Some(Elem::BR),
+        "meta" => Some(Elem::META),
+        "script" => Some(Elem::SCRIPT),
+        "style" => Some(Elem::STYLE),
 
         _ => None
     }

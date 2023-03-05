@@ -29,6 +29,9 @@ pub enum Elem {
     UL,
     LI,
     BR,
+    STYLE,
+    SCRIPT,
+    META
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

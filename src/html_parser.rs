@@ -1,7 +1,7 @@
 use crate::html_adt::{Attrs, Elem, Token};
 use lazy_static::lazy_static;
 use nom::branch::alt;
-use nom::bytes::complete::{tag, take_while};
+use nom::bytes::complete::{tag, take_while, is_a};
 use nom::character::complete::{anychar, char, multispace0, none_of};
 use nom::combinator::{eof, fail, opt, peek};
 use nom::multi::{many0, many1, many_till};
@@ -11,7 +11,7 @@ use std::borrow::Cow;
 
 pub fn parse_html<'a>(i: &'a str) -> IResult<Cow<'a, str>, Vec<Token>> {
     let parsed = pre_process(i);
-    //println!("{}", parsed);
+    println!("{}", parsed);
     match parse_inner(&parsed) {
         Ok((_, tokens)) => Ok((Cow::from(i), tokens)),
         Err(_) => fail(Cow::from(i))
@@ -252,13 +252,13 @@ fn p_close_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, Token> {
 }
 
 fn p_skip_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, ()> {
-    //println!("START: skipping ({:#?}) : {}",elem,i);
+    println!("START: skipping ({:#?}) : {}",elem,i);
     let (i, _) = p_open_tag_by_elem(elem, i)?;
 
     let (i, _) = many_till(none_of(""), |n| p_close_tag_by_elem(elem, n))(i)?;
     let (i,_) = opt(|n| p_close_tag_by_elem(elem,n))(i)?;
 
-    //println!("OK: skipping ({:#?}) : {}",elem,i);
+    println!("OK: skipping ({:#?}) : {}",elem,i);
     return Ok((i, ()));
 }
 
@@ -308,25 +308,57 @@ fn p_attr_name(i:&str) -> IResult<&str,String> {
 }
 
 fn p_unquoted(i:&str) -> IResult<&str,String> {
-    let (i,value) = many1(none_of(" \"\'>/=`"))(i)?;
-    let s : String= value.into_iter().collect();
+    let (i,s) = p_string2(i)?;
     return Ok((i,s));
 }
 
 fn p_double_quotes(i:&str) -> IResult<&str,String> {
     let (i,_) = char('"')(i)?;
-    let (i,value) = many1(none_of(" \"\'>/="))(i)?;
-    let s : String= value.into_iter().collect();
+    let (i,s) = p_string(i)?;
     let (i,_) = char('"')(i)?;
     return Ok((i,s));
 }
 
 fn p_single_quotes(i:&str) -> IResult<&str,String> {
     let (i,_) = char('\'')(i)?;
-    let (i,value) = many1(none_of(" \"\'>/="))(i)?;
+    let (i,s) = p_string(i)?;
     let (i,_) = char('\'')(i)?;
+    return Ok((i,s));
+}
+
+fn p_string(i:&str) -> IResult<&str,String> {
+    let (i,s) = many1(alt((p_escapes,p_non_esc)))(i)?;
+    let stwo :String = s.into_iter().collect();
+
+    Ok((i,stwo))
+}
+
+fn p_string2(i:&str) -> IResult<&str,String> {
+    let (i,s) = many1(alt((p_escapes,p_non_esc)))(i)?;
+    let stwo :String = s.into_iter().collect();
+
+    Ok((i,stwo))
+}
+
+fn p_non_esc(i:&str) -> IResult<&str,String> {
+    let (i,value) = many1(none_of(">/="))(i)?;
+    let (i,_) = char('\'')(i)?;
+    let (i,s) = p_string(i)?;
     let s : String= value.into_iter().collect();
     return Ok((i,s));
+}
+
+fn p_non_esc2(i:&str) -> IResult<&str,String> {
+    let (i,value) = many1(none_of(">/="))(i)?;
+    let (i,_) = char('\'')(i)?;
+    let (i,s) = p_string(i)?;
+    let s : String= value.into_iter().collect();
+    return Ok((i,s));
+}
+fn p_escapes(i:&str) -> IResult<&str,String> {
+    let (i,_) = char('\\')(i)?;
+    let (i,a) =  is_a("nr\"\'\"?\\")(i)?;
+    return Ok((i,String::from(a)));
 }
 
 fn disco(){

@@ -7,7 +7,6 @@ mod requester;
 use clap::{Parser, Subcommand};
 use std::fs::File;
 use std::io::{stdin, stdout, Read, Write};
-use std::process::{Command, Stdio};
 use termion::event::{Event, Key};
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
@@ -59,16 +58,12 @@ fn main() {
 
     // Pass the parsed HTML to the renderer
     let mut r: renderer::Renderer = Default::default();
-    match parsed_html {
-        Ok(p) => {
-            let rendered_html = r.render(&p.1);
-            match rendered_html {
-                Ok(html) => reader(html),
-                Err(err) => reader(format!("{}",  err))
-            }
-        },
-        Err(e) => {
-            reader(format!("{}", e));
+    if let Ok(p) = parsed_html {
+        println!("{:?}", p.1);
+        let rendered_html = r.render(&p.1);
+        match rendered_html {
+            Ok(html) => reader(html),
+            Err(err) => reader(format!("{}",  err))
         }
     }
 
@@ -104,11 +99,68 @@ fn read_line() -> String {
 }
 
 fn reader(rendered_html: String) {
-    let mut less = Command::new("less")
-        .args(&["-R"])
-        .stdin(Stdio::piped())
-        .spawn()
-        .unwrap();
-    less.stdin.as_mut().unwrap().write_all(rendered_html.as_bytes()).unwrap();
-    less.wait().unwrap();
+    let mut scroll_offset = 0;
+
+    let stdin = stdin();
+    let mut events = stdin.events();
+
+    // enable raw mode to read events without waiting for enter key
+    let mut stdout = stdout().into_raw_mode().unwrap();
+    write!(stdout, "{}", cursor::Hide).unwrap();
+
+    loop {
+        // clear the terminal and move cursor to top-left
+        write!(stdout, "{}{}", clear::All, cursor::Goto(1, 1)).unwrap();
+
+        // get terminal size to determine how many lines we can show
+        let (_term_width, term_height) = terminal_size().unwrap();
+        let max_lines = term_height - 2; // leave 1 line for input prompt and 1 line for status message
+
+        // print the current viewable portion of the HTML
+        let html_lines = rendered_html
+            .lines()
+            .skip(scroll_offset)
+            .take(max_lines.into());
+        for line in html_lines {
+            writeln!(stdout, "{}", line).unwrap();
+            write!(stdout, "\r").unwrap();
+        }
+
+        // print status message and input prompt
+        writeln!(stdout, "Press 'q' to quit, up/down arrow keys to scroll.\r").unwrap();
+        stdout.flush().unwrap();
+
+        // read user input events
+        if let Some(Ok(event)) = events.next() {
+            match event {
+                Event::Key(key) => match key {
+                    Key::Char('q') => {
+                        break;
+                    }
+                    Key::Up => {
+                        // scroll up
+                        if scroll_offset > 0 {
+                            scroll_offset -= 1;
+                        }
+                    }
+                    Key::Down => {
+                        // scroll down
+                        scroll_offset += 1;
+                        if scroll_offset > rendered_html.lines().count() {
+                            scroll_offset = rendered_html.lines().count();
+                        }
+                    }
+                    _ => (),
+                },
+                _ => (),
+            }
+        }
+    }
+
+    // disable raw mode before returning
+    write!(stdout, "{}", cursor::Show).unwrap();
+    stdout.flush().unwrap();
+    drop(stdout);
+
+    return;
 }

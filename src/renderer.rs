@@ -10,6 +10,57 @@ pub struct Renderer {
 }
 
 impl Renderer {
+    fn parse_table(tokens: &Vec<Token>) -> Result<Vec<(usize, usize)>, Box<dyn Error>> {
+        let mut lengths: Vec<Vec<Vec<usize>>> = Vec::new();
+        let mut table_stack: Vec<Elem> = Vec::new();
+
+        for token in tokens {
+            match token {
+                Token::START(elem, _) => {
+                    match elem {
+                        Elem::TABLE => {
+                            if !table_stack.last().is_none() {
+                                return Err("Must not be in table to have <table>")?
+                            }
+                            table_stack.push(Elem::TABLE);
+                            lengths.push(Vec::new());
+                        },
+                        Elem::TBODY => {
+                            if let Some(l) = table_stack.last() {
+                                if *l != Elem::TABLE {
+                                    return Err("Can't have <tbody> outside <table>.")?;
+                                }
+                            } else {
+                                return Err("Can't have <tbody> outside <table>.")?
+                            }
+                            table_stack.push(Elem::TBODY);
+                            lengths.last_mut().ok_or("Can't have <tbody> outside <table>.")?.push(Vec::new());
+                        },
+                        Elem::TR => {
+                            if let Some(l) = table_stack.last() {
+                                if *l != Elem::TBODY || *l != Elem::THEAD {
+
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                },
+                Token::END(elem, _) => {
+                    match elem {
+                        Elem::TABLE => {
+                            table_stack.pop();
+                        },
+                        _ => {}
+                    }
+                },
+                _ => {}
+            }
+        }
+
+        todo!()
+    }
+
     pub fn render(&mut self, tokens: &Vec<Token>) -> Result<String, Box<dyn Error>> {
         let mut output = String::new();
 

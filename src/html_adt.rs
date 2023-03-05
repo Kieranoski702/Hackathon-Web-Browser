@@ -28,6 +28,12 @@ pub enum Elem {
     OL,
     UL,
     LI,
+    TABLE,
+    THEAD,
+    TBODY,
+    TR,
+    TH,
+    TD
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

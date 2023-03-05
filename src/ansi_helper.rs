@@ -77,6 +77,10 @@ pub fn set_bg_colour(c: &RGB) -> String {
     write_code(format!("48;2;{};{};{}m", c.0, c.1, c.2).as_str())
 }
 
+pub fn move_up_lines(n: usize) -> String {
+    write_code(format!("{}A", n).as_str())
+}
+
 fn write_code(code: &str) -> String {
     format!("{}{}", CSI, code)
 }

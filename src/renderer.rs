@@ -38,6 +38,7 @@ impl Renderer {
                     Elem::H3 => self.end_h3(),
                     Elem::H4 | Elem::H5 => self.end_small_head(),
                     Elem::A => self.end_a(attrs),
+                    Elem::P => self.nl(),
                     Elem::DIV => self.nl(),
                     Elem::UL | Elem::OL => self.end_list(),
                     Elem::LI => self.nl(),
@@ -48,6 +49,8 @@ impl Renderer {
 
             output.push_str(token_str.as_str());
         }
+
+        output.push_str(&ansi_helper::reset_all());
 
         Ok(output.trim_end().to_string())
     }
@@ -78,7 +81,7 @@ impl Renderer {
 
     fn start_h1(&self) -> String {
         format!(
-            "{}{}\n",
+            "{}{}",
             ansi_helper::bold_on(),
             ansi_helper::set_fg_colour(&colours::RED)
         )
@@ -86,7 +89,7 @@ impl Renderer {
 
     fn end_h1(&self) -> String {
         format!(
-            "{}{}",
+            "{}{}\n",
             ansi_helper::bold_off(),
             ansi_helper::reset_fg_colour()
         )
@@ -132,12 +135,18 @@ impl Renderer {
 
     fn start_list(&mut self, elem: Elem) -> String {
         self.list_stack.push((elem, 1));
-        String::new()
+        // If this isn't the only list open.
+        if self.list_stack.len() > 1 {
+            self.nl()
+        } else {
+            String::new()
+        }
     }
 
     fn end_list(&mut self) -> String {
         self.list_stack.pop();
-        String::new()
+        // Need to move up a line to remove the trailing nl for the end_li.
+        ansi_helper::move_up_lines(1)
     }
 
     fn start_li(&mut self) -> Result<String, Box<dyn Error>> {

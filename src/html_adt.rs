@@ -38,6 +38,8 @@ pub enum Token {
 }
 
 impl Token {
+    #![allow(unused)]
+
     pub fn start(e: Elem) -> Self {
         Token::START(e, Attrs::new())
     }

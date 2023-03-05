@@ -260,6 +260,7 @@ name = "hackathon_web_browser"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "lazy_static",
  "nom",
  "regex",
  "reqwest",

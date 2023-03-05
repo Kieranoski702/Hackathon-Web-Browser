@@ -145,8 +145,13 @@ impl Renderer {
 
     fn end_list(&mut self) -> String {
         self.list_stack.pop();
-        // Need to move up a line to remove the trailing nl for the end_li.
-        ansi_helper::move_up_lines(1)
+        // If it's the last list don't change the length.
+        if self.list_stack.len() == 0 {
+            String::new()
+        } else {
+            // Need to move up a line to remove the trailing nl for the end_li.
+            ansi_helper::move_up_lines(1)
+        }
     }
 
     fn start_li(&mut self) -> Result<String, Box<dyn Error>> {

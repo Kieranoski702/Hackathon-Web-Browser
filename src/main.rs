@@ -68,26 +68,36 @@ fn main() {
     }
 
     let mut should_quit = false;
-    while !should_quit {
-        let input = read_line();
-        match input.trim() {
-            "quit" => should_quit = true,
-            "search" => {
-                let url = read_line();
-                let contents = requester::request(&url).unwrap();
-                let parsed_html = html_parser::parse_html(&contents);
-                if let Ok(p) = parsed_html {
-                    println!("{:?}", p.1);
-                    let rendered_html = r.render(&p.1);
-                    match rendered_html {
-                        Ok(html) => reader(html),
-                        Err(err) => reader(format!("{}", err))
-                    }
+while !should_quit {
+    let input = read_line();
+    match input.trim() {
+        "quit" => should_quit = true,
+        "search" => {
+            let url = read_line();
+            let contents = requester::request(&url).unwrap();
+            let parsed_html = html_parser::parse_html(&contents);
+            if let Ok(p) = parsed_html {
+                println!("{:?}", p.1);
+                let rendered_html = r.render(&p.1);
+                match rendered_html {
+                    Ok(html) => {
+                        reader(html);
+                    },
+                    Err(err) => reader(format!("{}", err))
                 }
             }
-            _ => println!("Invalid command"),
-        }
+        },
+        "open" => {
+            let file_path = read_line();
+            let mut file = File::open(&file_path).unwrap();
+            let mut contents = String::new();
+            file.read_to_string(&mut contents).unwrap();
+            reader(contents);
+        },
+        _ => println!("Invalid command"),
     }
+}
+
 }
 
 fn read_line() -> String {

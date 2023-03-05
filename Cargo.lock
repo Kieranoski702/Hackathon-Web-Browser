@@ -263,10 +263,7 @@ dependencies = [
  "lazy_static",
  "nom",
  "regex",
-<<<<<<< HEAD
-=======
  "reqwest",
->>>>>>> origin/main
  "termion",
 ]
 

@@ -20,7 +20,7 @@ pub fn parse_html<'a>(i: &'a str) -> IResult<Cow<'a, str>, Vec<Token>> {
 
 fn pre_process(i: &str) -> Cow<'_, str> {
     lazy_static! {
-        static ref REMOVE_RE: Regex = Regex::new(r"(?:(?s)<!--.*-->)|<![^>]*>").unwrap();
+        static ref REMOVE_RE: Regex = Regex::new(r"(?:(?s)<!--.*?-->)|<![^>]*?>").unwrap();
     }
 
     REMOVE_RE.replace_all(i, "")
@@ -129,7 +129,7 @@ fn p_open_tag(i: &str) -> IResult<&str, Token> {
         },
         Some(e) => {
             // println!("OK: p_open_tag ({}) {}", name,i);
-            return Ok((i, Token::END(e, Attrs::new())));
+            return Ok((i, Token::START(e,attrs)));
         }
     }
 
@@ -214,7 +214,7 @@ fn p_open_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, Token> {
     let (i, token) = p_open_tag(i)?;
     let token_elem = match token {
         Token::START(e, _) => e,
-        Token::END(e, _) => e,
+        //Token::END(e, _) => e,
         _ => todo!(),
     };
     if token_elem.eq(&elem) {

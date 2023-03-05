@@ -1,15 +1,35 @@
 use crate::html_adt::{Attrs, Elem, Token};
+use lazy_static::lazy_static;
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_while};
 use nom::character::complete::{anychar, char, multispace0, none_of};
 use nom::combinator::{eof, fail, opt, peek};
 use nom::multi::{many0, many1, many_till};
 use nom::IResult;
+use regex::Regex;
+use std::borrow::Cow;
+
+pub fn parse_html<'a>(i: &'a str) -> IResult<Cow<'a, str>, Vec<Token>> {
+    let parsed = pre_process(i);
+    println!("{}", parsed);
+    match parse_inner(&parsed) {
+        Ok((_, tokens)) => Ok((Cow::from(i), tokens)),
+        Err(_) => fail(Cow::from(i))
+    }
+}
+
+fn pre_process(i: &str) -> Cow<'_, str> {
+    lazy_static! {
+        static ref REMOVE_RE: Regex = Regex::new(r"(?:(?s)<!--.*-->)|<![^>]*>").unwrap();
+    }
+
+    REMOVE_RE.replace_all(i, "")
+}
 
 /**
  * Parse a HTML file into a HTML object.
  */
-pub fn parse_html<'a>(i: &'a str) -> IResult<&'a str, Vec<Token>> {
+fn parse_inner<'a>(i: &'a str) -> IResult<&'a str, Vec<Token>> {
     // println!("START: p_html {} ", i);
     let (i, _) = opt(|n| p_open_tag_by_elem(Elem::HTML, n))(i)?;
     let (i, _) = opt(|n| p_skip_tag_by_elem(Elem::HEAD, n))(i)?;
@@ -170,6 +190,8 @@ fn match_elem(name: &str) -> Elem {
         "li" => Elem::LI,
         "ol" => Elem::OL,
         "ul" => Elem::UL,
+        "section" => Elem::DIV,
+        "br" => Elem::BR,
 
         _ => unimplemented!("HTML tag {} not implemented", a),
     }
@@ -204,9 +226,13 @@ fn p_close_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, Token> {
 }
 
 fn p_skip_tag_by_elem(elem: Elem, i: &str) -> IResult<&str, ()> {
+    //println!("START: skipping ({:#?}) : {}",elem,i);
     let (i, _) = p_open_tag_by_elem(elem, i)?;
+
     let (i, _) = many_till(none_of(""), |n| p_close_tag_by_elem(elem, n))(i)?;
-    //let (i, _) = p_close_tag_by_elem(elem, i)?;
+    let (i,_) = opt(|n| p_close_tag_by_elem(elem,n))(i)?;
+
+    //println!("OK: skipping ({:#?}) : {}",elem,i);
     return Ok((i, ()));
 }
 

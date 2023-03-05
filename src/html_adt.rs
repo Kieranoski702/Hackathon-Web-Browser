@@ -33,7 +33,8 @@ pub enum Elem {
     TBODY,
     TR,
     TH,
-    TD
+    TD,
+    BR
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

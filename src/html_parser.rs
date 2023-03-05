@@ -71,10 +71,18 @@ fn p_elem(i: &str) -> IResult<&str, Vec<Token>> {
     let mut vec = Vec::new();
 
     let inner: Vec<Token> = inner.into_iter().flatten().collect();
+
+    let start2 = Token::clone(&start);
     vec.push(start);
     vec.extend(inner);
+
     if let Some(c) = close {
-        vec.push(c)
+        if let Token::START(_,b) = start2 {
+            if let Token::END(e1, _) = c{
+            let c = Token::END(e1,b);
+            vec.push(c)
+        }
+    }
     };
 
     println!("VALID TAG {:#?}", vec);

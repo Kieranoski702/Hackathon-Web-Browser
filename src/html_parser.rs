@@ -2,7 +2,7 @@ use crate::html_adt::{Attrs, Elem, Token};
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_while};
 use nom::character::complete::{anychar, char, multispace0, none_of};
-use nom::combinator::{eof, fail, opt, peek, success, map_parser};
+use nom::combinator::{eof, fail, opt, peek};
 use nom::multi::{many0, many1, many_till};
 use nom::IResult;
 
@@ -165,7 +165,10 @@ fn match_elem(name: &str) -> Elem {
         "div" => Elem::DIV,
         "nav" => Elem::NAV,
         "main" => Elem::MAIN,
-        "a"   => Elem::A,
+        "a" => Elem::A,
+        "li" => Elem::LI,
+        "ol" => Elem::OL,
+        "ul" => Elem::UL,
 
         _ => unimplemented!("HTML tag {} not implemented", a),
     }

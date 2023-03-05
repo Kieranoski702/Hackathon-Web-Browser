@@ -128,7 +128,6 @@ fn reader(rendered_html: String) {
 
         // print status message and input prompt
         writeln!(stdout, "Press 'q' to quit, up/down arrow keys to scroll.\r").unwrap();
-        writeln!(stdout, "> \r").unwrap();
         stdout.flush().unwrap();
 
         // read user input events

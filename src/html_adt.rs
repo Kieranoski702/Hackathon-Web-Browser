@@ -28,6 +28,7 @@ pub enum Elem {
     OL,
     UL,
     LI,
+    BR,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

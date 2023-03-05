@@ -169,6 +169,8 @@ fn match_elem(name: &str) -> Elem {
         "li" => Elem::LI,
         "ol" => Elem::OL,
         "ul" => Elem::UL,
+        "section" => Elem::DIV,
+        "br" => Elem::BR,
 
         _ => unimplemented!("HTML tag {} not implemented", a),
     }

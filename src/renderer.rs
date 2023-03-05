@@ -39,9 +39,13 @@ impl Renderer {
                         Elem::TR => {
                             if let Some(l) = table_stack.last() {
                                 if *l != Elem::TBODY || *l != Elem::THEAD {
-
+                                    return Err("Can't have <tr> outside <tbody>")?;
                                 }
+                            } else {
+                                return Err("Can't have <tr> outside <tbody>")?;
                             }
+                            table_stack.push(Elem::TR);
+                            lengths.last_mut().ok_or("Error")
                         }
                         _ => {}
                     }
